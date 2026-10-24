@@ -1,0 +1,68 @@
+﻿@model IEnumerable<WorkSphere.Models.Employee>
+
+@if (TempData["SuccessMessage"] is string message)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @message
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold">Employees</h1>
+            <p class="text-muted">Manage your WorkSphere team.</p>
+        </div>
+        <span class="badge bg-primary fs-6">
+            Total: @Model.Count()
+        </span>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Job Title</th>
+                        <th>Department ID</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@employee.FullName</strong>
+                                <div class="text-muted small">
+                                    @employee.Email
+                                </div>
+                            </td>
+                            <td>@employee.JobTitle</td>
+                            <td>@employee.DepartmentId</td>
+                            <td>@employee.Salary.ToString("C")</td>
+                            <td>
+                                @if (employee.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

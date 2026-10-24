@@ -1,0 +1,19 @@
+#Build output 
+bin/
+obj/
+
+#Visual Studio Files
+.vs/
+*.suo
+*.user
+*.userossache
+*.sln.docstates
+
+#IDE Files
+.idea/
+
+#Logs
+*.log
+
+#Local Environment Settings and Secrets
+appsettings.Development.json

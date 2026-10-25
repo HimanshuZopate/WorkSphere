@@ -7,6 +7,8 @@ namespace WorkSphere.Models;
 [Table("Employees")]
 public class Employee
 {
+
+    public Department? Department { get; set; }
     [Key]
     public int EmployeeId { get; set; }
 

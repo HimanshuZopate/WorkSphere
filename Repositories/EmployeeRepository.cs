@@ -26,9 +26,11 @@ public class EmployeeRepository : IEmployeeRepository
         bool? isActive
         )
     {
-        var query = _context.Employees.AsNoTracking().AsQueryable();
-
-        if(!string.IsNullOrWhiteSpace(name))
+        var query = _context.Employees
+            .AsNoTracking()
+            .Include(e => e.Department)
+            .AsQueryable();
+        if (!string.IsNullOrWhiteSpace(name))
         {
             query = query.Where(e => e.FullName.Contains(name.Trim()));
         }
@@ -52,8 +54,52 @@ public class EmployeeRepository : IEmployeeRepository
     public async Task<List<Employee>> GetAllAsync()
     {
         return await _context.Employees
-            .AsNoTracking()
-            .OrderBy(e => e.FullName)
-            .ToListAsync();
+    .AsNoTracking()
+    .Include(e => e.Department)
+    .OrderBy(e => e.FullName)
+    .ToListAsync();
     }
+
+
+    public async Task<(List<Employee> Employees, int TotalCount)> GetPagedAsync(
+        string? name,
+        int? departmentId,
+        bool? isActive,
+        int page,
+        int pageSize)
+    {
+        var query = _context.Employees
+            .AsNoTracking()
+            .Include(e => e.Department)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            query = query.Where(e =>
+                e.FullName.Contains(name.Trim()));
+        }
+
+        if (departmentId.HasValue)
+        {
+            query = query.Where(e =>
+                e.DepartmentId == departmentId.Value);
+        }
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(e =>
+                e.IsActive == isActive.Value);
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var employees = await query
+            .OrderBy(e => e.FullName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (employees, totalCount);
+    }
+
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkSphere.Models;
@@ -7,11 +8,11 @@ namespace WorkSphere.Models;
 public class Department
 {
     [Key]
-    public int DepartMentId { get; set; }
+    public int DepartmentId { get; set; }
 
     [Required]
     [StringLength(100)]
-    public string DepartmentName { get; set; }= string.Empty;
+    public string DepartmentName { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
 }

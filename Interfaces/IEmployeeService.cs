@@ -14,4 +14,12 @@ public interface IEmployeeService
         string? name,
         int? departmentId,
         bool? isActive);
+
+    Task<(List<Employee> Employees, int TotalCount)> GetPagedEmployeesAsync(
+        string? name,
+        int? departmentId,
+        bool? isActive,
+        int page,
+        int pageSize
+       );
 }

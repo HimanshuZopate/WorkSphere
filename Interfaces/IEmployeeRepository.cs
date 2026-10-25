@@ -16,4 +16,15 @@ public interface IEmployeeRepository
         );
 
 
+    Task<(List<Employee> Employees, int TotalCount)> GetPagedAsync(
+        string? name,
+        int? departmentId,
+        bool? isActive,
+        int page,
+        int pageSize);
+
+
+
+
+
 }

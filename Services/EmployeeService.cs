@@ -2,7 +2,6 @@
 using WorkSphere.Interfaces;
 using WorkSphere.Models;
 using WorkSphere.ViewModel;
-using WorkSphere.ViewModel;
 
 namespace WorkSphere.Services;
 
@@ -30,7 +29,7 @@ public class EmployeeService : IEmployeeService
         var departments = await _departmentRepository.GetAllAsync();
 
         bool departmentExists = departments.Any(
-            d => d.DepartMentId == model.DepartmentId);
+            d => d.DepartmentId == model.DepartmentId);
 
         if (!departmentExists)
         {
@@ -61,5 +60,23 @@ public class EmployeeService : IEmployeeService
             name,
             departmentId,
             isActive);
+    }
+
+    public async Task<(List<Employee> Employees, int TotalCount)> GetPagedEmployeesAsync(
+        string? name,
+        int? departmentId,
+        bool? isActive,
+        int page,
+        int pageSize)
+    {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        return await _repository.GetPagedAsync(
+            name,
+            departmentId,
+            isActive,
+            page,
+            pageSize);
     }
 }

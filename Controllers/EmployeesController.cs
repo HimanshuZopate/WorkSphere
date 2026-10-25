@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WorkSphere.Interfaces;
+using WorkSphere.Models;
 using WorkSphere.ViewModel;
-using WorkSphere.ViewModel;
+using System.Linq;
+using System;
 
 namespace WorkSphere.Controllers;
 
@@ -20,24 +22,36 @@ public class EmployeesController : Controller
         _departmentRepository = departmentRepository;
     }
 
+
     public async Task<IActionResult> Index(
         string? name,
         int? departmentId,
-        bool? isActive)
+        bool? isActive,
+        int page = 1)
     {
-        var employees = await _employeeService.SearchEmployeesAsync(
+        const int pageSize = 10;
+
+        var result = await _employeeService.GetPagedEmployeesAsync(
             name,
             departmentId,
-            isActive);
+            isActive,
+            page,
+            pageSize);
 
-        await LoadDepartmentsAsync();
+        await LoadDepartmentsAsync(departmentId);
 
         ViewBag.Name = name;
         ViewBag.DepartmentId = departmentId;
         ViewBag.IsActive = isActive;
+        ViewBag.CurrentPage = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalCount = result.TotalCount;
+        ViewBag.TotalPages = (int)Math.Ceiling(
+            result.TotalCount / (double)pageSize);
 
-        return View(employees);
+        return View(result.Employees);
     }
+
 
     [HttpGet]
     public async Task<IActionResult> Create()
@@ -55,7 +69,7 @@ public class EmployeesController : Controller
         Console.WriteLine($"Selected Department ID: {model.DepartmentId}");
         if (!ModelState.IsValid)
         {
-            await LoadDepartmentsAsync();
+            await LoadDepartmentsAsync(model.DepartmentId);
             return View(model);
         }
 
@@ -68,21 +82,36 @@ public class EmployeesController : Controller
         catch (ArgumentException ex)
         {
             ModelState.AddModelError(nameof(model.DepartmentId), ex.Message);
-            await LoadDepartmentsAsync();
+            await LoadDepartmentsAsync(model.DepartmentId);
             return View(model);
         }
     }
 
 
-    private async Task LoadDepartmentsAsync()
+
+
+    private async Task LoadDepartmentsAsync(int? selectedDepartmentId = null)
     {
         var departments = await _departmentRepository.GetAllAsync();
 
+        if (departments == null)
+        {
+            throw new InvalidOperationException(
+                "Department repository returned a null list.");
+        }
+
+        var validDepartments = departments
+            .Where(d => d != null)
+            .ToList();
+
         ViewBag.Departments = new SelectList(
-            departments ?? new List<WorkSphere.Models.Department>(),
-            nameof(WorkSphere.Models.Department.DepartMentId),
-            nameof(WorkSphere.Models.Department.DepartmentName)
-        );
+            validDepartments,
+            nameof(Department.DepartmentId),
+            nameof(Department.DepartmentName),
+            selectedDepartmentId);
     }
+
+
+
 
 }

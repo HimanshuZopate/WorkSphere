@@ -20,9 +20,22 @@ public class EmployeesController : Controller
         _departmentRepository = departmentRepository;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(
+        string? name,
+        int? departmentId,
+        bool? isActive)
     {
-        var employees = await _employeeService.GetAllEmployeesAsync();
+        var employees = await _employeeService.SearchEmployeesAsync(
+            name,
+            departmentId,
+            isActive);
+
+        await LoadDepartmentsAsync();
+
+        ViewBag.Name = name;
+        ViewBag.DepartmentId = departmentId;
+        ViewBag.IsActive = isActive;
+
         return View(employees);
     }
 

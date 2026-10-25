@@ -51,4 +51,15 @@ public class EmployeeService : IEmployeeService
 
         await _repository.AddAsync(employee);
     }
+    public async Task<List<Employee>> SearchEmployeesAsync(
+        string? name,
+        int? departmentId,
+        bool? isActive
+        )
+    {
+        return await _repository.SearchAsync(
+            name,
+            departmentId,
+            isActive);
+    }
 }

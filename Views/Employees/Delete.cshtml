@@ -1,0 +1,56 @@
+﻿@model WorkSphere.Models.Employee
+
+@{
+    ViewData["Title"] = "Delete Employee";
+}
+
+<div class="container-fluid px-4 px-lg-5 py-4">
+    <div class="mb-4">
+        <h1 class="fw-bold">Delete Employee</h1>
+        <p class="text-secondary">Review the details before proceeding.</p>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+
+            <div class="alert alert-warning" role="alert">
+                <strong>Warning:</strong>
+                This action permanently deletes the employee record.
+            </div>
+
+            <h4 class="mb-3">@Model.FullName</h4>
+
+            <dl class="row">
+                <dt class="col-sm-3">Employee ID</dt>
+                <dd class="col-sm-9">@Model.EmployeeId</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Job Title</dt>
+                <dd class="col-sm-9">@Model.JobTitle</dd>
+
+                <dt class="col-sm-3">Department</dt>
+                <dd class="col-sm-9">
+                    @(Model.Department?.DepartmentName ?? "Unknown")
+                </dd>
+            </dl>
+
+            <form asp-action="Delete"
+                  asp-route-id="@Model.EmployeeId"
+                  method="post">
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-danger">
+                        Confirm Delete
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,93 @@
+﻿@model WorkSphere.ViewModel.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Dashboard</h2>
+        <p class="text-muted">WorkSphere overview and statistics</p>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6 class="text-muted">Total Employees</h6>
+                <h2 class="fw-bold">@Model.TotalEmployees</h2>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6 class="text-muted">Active Employees</h6>
+                <h2 class="fw-bold text-success">@Model.ActiveEmployees</h2>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6 class="text-muted">Inactive Employees</h6>
+                <h2 class="fw-bold text-danger">@Model.InactiveEmployees</h2>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6 class="text-muted">Departments</h6>
+                <h2 class="fw-bold text-primary">@Model.TotalDepartments</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0 p-4">
+        <h5 class="fw-bold mb-3">Department-wise Employees</h5>
+        <div style="height: 350px;">
+            <canvas id="departmentChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                        Model.DepartmentStats.Select(x => x.DepartmentName)
+                )
+        );
+
+    const values = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                        Model.DepartmentStats.Select(x => x.EmployeeCount)
+                )
+        );
+
+    new Chart(document.getElementById('departmentChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Employees',
+                data: values,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>

@@ -22,4 +22,14 @@ public interface IEmployeeService
         int page,
         int pageSize
        );
+
+    Task<Employee?> GetEmployeeByIdAsync(int id);
+
+    Task<EditEmployeeViewModel?> GetEmployeeForEditAsync(int id);
+
+    Task UpdateEmployeeAsync(int id, EditEmployeeViewModel model);
+
+    Task<Employee?> GetEmployeeForDeleteAsync(int id);
+    Task<bool> DeleteEmployeeAsync(int id);
+ 
 }

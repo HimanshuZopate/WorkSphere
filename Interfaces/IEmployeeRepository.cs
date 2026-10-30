@@ -24,6 +24,12 @@ public interface IEmployeeRepository
         int pageSize);
 
 
+    Task<Employee?> GetByIdAsync(int id);
+
+    Task UpdateAsync(Employee employee);
+
+    Task<bool> DeleteAsync(int id);
+
 
 
 

@@ -79,4 +79,98 @@ public class EmployeeService : IEmployeeService
             page,
             pageSize);
     }
+
+    public async Task<Employee?> GetEmployeeByIdAsync(int id)
+    {
+        if (id <= 0)
+        {
+            return null;
+        }
+        return await _repository.GetByIdAsync(id);
+    }
+
+
+    public async Task<EditEmployeeViewModel?> GetEmployeeForEditAsync(int id)
+    {
+        if (id <= 0)
+        {
+            return null;
+        }
+
+        var employee = await _repository.GetByIdAsync(id);
+
+        if (employee == null)
+        {
+            return null;
+        }
+
+        return new EditEmployeeViewModel
+        {
+            EmployeeId = employee.EmployeeId,
+            FullName = employee.FullName,
+            Email = employee.Email,
+            JobTitle = employee.JobTitle,
+            Salary = employee.Salary,
+            HireDate = employee.HireDate,
+            DepartmentId = employee.DepartmentId,
+            IsActive = employee.IsActive
+        };
+    }
+
+    public async Task UpdateEmployeeAsync(int id, EditEmployeeViewModel model)
+    {
+        if (id <= 0 || id != model.EmployeeId)
+        {
+            throw new ArgumentException("Invalid employee ID.");
+        }
+
+        var employee = await _repository.GetByIdAsync(id);
+
+        if (employee == null)
+        {
+            throw new KeyNotFoundException("Employee not found.");
+        }
+
+        var departments = await _departmentRepository.GetAllAsync();
+
+        bool departmentExists = departments.Any(
+            d => d.DepartmentId == model.DepartmentId);
+
+        if (!departmentExists)
+        {
+            throw new ArgumentException(
+                "The selected department does not exist.");
+        }
+
+        employee.FullName = model.FullName.Trim();
+        employee.Email = model.Email.Trim();
+        employee.JobTitle = model.JobTitle.Trim();
+        employee.Salary = model.Salary;
+        employee.HireDate = model.HireDate;
+        employee.DepartmentId = model.DepartmentId;
+        employee.IsActive = model.IsActive;
+
+        await _repository.UpdateAsync(employee);
+    }
+
+    public async Task<Employee?> GetEmployeeForDeleteAsync(int id)
+    {
+        if(id <= 0)
+        {
+            return null;
+        }
+
+        return await _repository.GetByIdAsync(id);
+    }
+
+    public async Task<bool> DeleteEmployeeAsync(int id)
+    {
+        if(id <= 0)
+        {
+            return false;
+        }
+
+        return await _repository.DeleteAsync(id);
+    }
+
 }

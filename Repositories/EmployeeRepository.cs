@@ -102,4 +102,33 @@ public class EmployeeRepository : IEmployeeRepository
         return (employees, totalCount);
     }
 
+    public async Task<Employee?> GetByIdAsync(int id)
+    {
+        return await _context.Employees
+            .AsNoTracking()
+            .Include(e => e.Department)
+            .FirstOrDefaultAsync(e => e.EmployeeId == id);
+    }
+
+    public async Task UpdateAsync(Employee employee)
+    {
+        _context.Employees.Update(employee);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var employee = await _context.Employees
+            .FirstOrDefaultAsync(e => e.EmployeeId == id);
+
+        if (employee == null)
+        {
+            return false;
+        }
+
+        _context.Employees.Remove(employee);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

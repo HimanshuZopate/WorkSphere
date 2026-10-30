@@ -88,6 +88,70 @@ public class EmployeesController : Controller
     }
 
 
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var employee = await _employeeService.GetEmployeeByIdAsync(id);
+        if (employee== null)
+        {
+            return NotFound();
+        }
+        return View(employee);
+    }
+
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var model = await _employeeService.GetEmployeeForEditAsync(id);
+
+        if (model == null)
+        {
+            return NotFound();
+        }
+
+        await LoadDepartmentsAsync(model.DepartmentId);
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, EditEmployeeViewModel model)
+    {
+        if (id != model.EmployeeId)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await LoadDepartmentsAsync(model.DepartmentId);
+            return View(model);
+        }
+
+        try
+        {
+            await _employeeService.UpdateEmployeeAsync(id, model);
+
+            TempData["SuccessMessage"] = "Employee updated successfully!";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (ArgumentException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+
+            await LoadDepartmentsAsync(model.DepartmentId);
+
+            return View(model);
+        }
+    }
+
 
 
     private async Task LoadDepartmentsAsync(int? selectedDepartmentId = null)
@@ -112,6 +176,33 @@ public class EmployeesController : Controller
     }
 
 
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var employee = await _employeeService.GetEmployeeForDeleteAsync(id);
+
+        if(employee == null)
+        {
+            return NotFound();
+        }
+
+        return View(employee);
+    }
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var deleted = await _employeeService.DeleteEmployeeAsync(id);
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        TempData["SuccessMessage"] = "Employee deleted successfully!";
+
+        return RedirectToAction(nameof(Index));
+    }
 
 
 }
